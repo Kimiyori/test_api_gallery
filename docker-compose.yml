@@ -20,5 +20,21 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - 5432:5432
+  lint:
+    build: .
+    command: bash -c "mypy src ; pylint src ; flake8"
+    working_dir: /test_api_gallery
+    profiles: ["test_profile"]
+    volumes:
+      - .:/test_api_gallery
+  test:
+    build: .
+    command: python -m  pytest src
+    working_dir: /test_api_gallery
+    profiles: ["test_profile"]
+    volumes:
+      - .:/test_api_gallery src
+    depends_on:
+      - db
 volumes:
   postgres_data:
