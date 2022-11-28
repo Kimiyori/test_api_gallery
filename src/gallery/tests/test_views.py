@@ -5,7 +5,6 @@ from users.tests.conftest import create_user, create_user2
 from django.urls import reverse
 from rest_framework import status
 from django.test.client import MULTIPART_CONTENT
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 @pytest.mark.usefixtures("create_user")
@@ -74,3 +73,5 @@ def test_upload_image_api(client, get_temporary_image):
     headers = {"HTTP_AUTHORIZATION": f"Bearer {pytest.user.token}"}
     response = client.post(url, data, content_type=MULTIPART_CONTENT, **headers)
     assert response.status_code == status.HTTP_200_OK
+    gallery=Gallery.objects.get(pk=pytest.gallery.pk)
+    assert gallery.images

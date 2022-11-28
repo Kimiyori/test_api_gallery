@@ -37,7 +37,5 @@ class GalleryNotSafeSerializer(serializers.ModelSerializer):
         return gallery
 
 
-class GalleryUploadImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ImageModel
-        fields = ("image",)
+class GalleryUploadImageSerializer(serializers.Serializer):
+    image=serializers.ImageField(max_length = 1000000, allow_empty_file = False, use_url = False)
