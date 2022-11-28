@@ -37,5 +37,9 @@ class GalleryNotSafeSerializer(serializers.ModelSerializer):
         return gallery
 
 
-class GalleryUploadImageSerializer(serializers.Serializer):
-    image=serializers.ImageField(max_length = 1000000, allow_empty_file = False, use_url = False)
+class GalleryUploadImageSerializer(  # pylint: disable=abstract-method
+    serializers.Serializer
+):
+    image = serializers.ImageField(
+        max_length=1000000, allow_empty_file=False, use_url=False
+    )

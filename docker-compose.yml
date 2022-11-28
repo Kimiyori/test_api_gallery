@@ -1,7 +1,13 @@
 services:
   web:
     build: .
-    command: python src/manage.py runserver 0.0.0.0:8000
+    command:  bash -c "
+        python src/manage.py makemigrations users
+        && python src/manage.py makemigrations gallery
+        && python src/manage.py migrate
+        && python src/manage.py create_admin
+        && python src/manage.py runserver 0.0.0.0:8000
+      "
     working_dir: /test_api_gallery
     volumes:
       - .:/test_api_gallery

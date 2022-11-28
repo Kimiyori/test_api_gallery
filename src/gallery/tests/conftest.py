@@ -4,10 +4,14 @@ from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image as ImageTest
 from io import BytesIO
-from gallery.models import Gallery
+from gallery.models import Gallery, ImageModel
 from users.tests.conftest import create_user
 
 TEST_DIR = "test_data"
+
+@pytest.fixture(autouse=True)
+def use_dummy_cache_backend(settings):
+    settings.MEDIA_ROOT = TEST_DIR + "/media/"
 
 
 @pytest.fixture
@@ -25,6 +29,13 @@ def get_temporary_image():
     image.save(temp_file, "png")
     temp_file.seek(0)
     return SimpleUploadedFile(f"test.jpg", temp_file.getvalue())
+
+
+@pytest.fixture
+def create_image(create_gallery, get_temporary_image):
+    pytest.image = ImageModel.objects.create(
+        image=get_temporary_image, gallery=pytest.gallery
+    )
 
 
 @pytest.fixture

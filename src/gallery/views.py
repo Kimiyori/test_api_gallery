@@ -3,7 +3,12 @@ from typing import Any
 from django.shortcuts import get_object_or_404
 
 from rest_framework import mixins, viewsets
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS, BasePermission
+from rest_framework.permissions import (
+    IsAuthenticated,
+    SAFE_METHODS,
+    BasePermission,
+    IsAdminUser,
+)
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -42,7 +47,7 @@ class GalleryViewSet(
         "retrieve": GallerySerializer,
         "update": GalleryNotSafeSerializer,
         "destroy": GalleryNotSafeSerializer,
-        "upload_image": GalleryUploadImageSerializer,
+        "image": GalleryUploadImageSerializer,
     }
 
     def get_permissions(self) -> list[BasePermission]:
@@ -76,7 +81,7 @@ class GalleryViewSet(
             FormParser,
         ],
     )
-    def upload_image(
+    def image(
         self, request: Request, pk: int  # pylint: disable=invalid-name
     ) -> Response:
         serializer = self.get_serializer(data=request.data)
@@ -85,3 +90,19 @@ class GalleryViewSet(
         gallery = get_object_or_404(Gallery, pk=pk)
         image = ImageModel.objects.create(gallery=gallery, image=image_file)
         return Response({"image_id": image.id}, status=status.HTTP_200_OK)
+
+
+class AdminGallery(
+    viewsets.GenericViewSet,
+):
+    """Admin gallery endpoints"""
+
+    queryset = ImageModel.objects.all()
+    permission_classes = (IsAdminUser,)
+
+    @action(detail=False, methods=["DELETE"])  # type: ignore
+    def images(  # pylint: disable=invalid-name,unused-argument
+        self, request: Request
+    ) -> Response:
+        self.get_queryset().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
